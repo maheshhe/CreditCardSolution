@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import com.tiff.ccengine.ccgenerator.services.CreditCardValidationException;
 import com.tiff.ccengine.creditcard.CardType;
@@ -31,7 +32,7 @@ public class CCValidatorEngine {
 		if(cardList != null && !cardList.isEmpty()) {
 		ExecutorService service = getExecutorService(cardList.get(0).getCardType());
 
-		Callable<List<T>> validator = new Validator<T>(cardList).getvalidator();
+		Callable<List<T>> validator = () -> cardList.stream().filter(T::isValidCard).collect(Collectors.toList());
 			try {
 				return service.submit(validator).get();
 			} catch (InterruptedException | ExecutionException e) {
